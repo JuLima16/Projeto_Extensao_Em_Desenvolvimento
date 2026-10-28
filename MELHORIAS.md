@@ -18,7 +18,7 @@
 | [PREENCHER] | @[PREENCHER] | [PREENCHER] |
 
 ### Repositórios
-- **Projeto Original**: `[PREENCHER — link do repositório anterior]`
+- **Projeto Original**: `(https://github.com/iDneris/AL-Cakes-FullStack)`
 - **Novo Repositório**: `[PREENCHER]`
 
 ---
