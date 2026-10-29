@@ -1,0 +1,30 @@
+{
+  "buildCommand": "cd backend && npm install && npm run build",
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/bolos",
+      "headers": [
+        { "key": "Cache-Control", "value": "s-maxage=60, stale-while-revalidate=300" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/auth/:path*", "destination": "/api/index.ts" },
+    { "source": "/bolos/:path*", "destination": "/api/index.ts" },
+    { "source": "/carrinho/:path*", "destination": "/api/index.ts" },
+    { "source": "/pedidos/:path*", "destination": "/api/index.ts" },
+    { "source": "/usuarios/:path*", "destination": "/api/index.ts" },
+    { "source": "/whatsapp/:path*", "destination": "/api/index.ts" },
+    { "source": "/teste/:path*", "destination": "/api/index.ts" },
+    { "source": "/api-docs/:path*", "destination": "/api/index.ts" },
+    { "source": "/pages/:path*", "destination": "/frontend/pages/:path*" },
+    { "source": "/assets/:path*", "destination": "/frontend/assets/:path*" },
+    { "source": "/components/:path*", "destination": "/frontend/components/:path*" },
+    { "source": "/", "destination": "/frontend/index.html" }
+  ]
+}

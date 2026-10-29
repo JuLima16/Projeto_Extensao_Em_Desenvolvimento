@@ -1,280 +1,217 @@
-# 📐 Modelagem do Sistema — AL Cakes
+<div align="center">
 
-Modelagem do sistema **como ele está implementado hoje** (extraída do código em `backend/src` e dos scripts de banco). Os diagramas usam Mermaid, que o GitHub renderiza automaticamente.
+# 🎂 A&L Cakes
 
-## 1. Diagrama de Classes (domínio)
+**Plataforma de e-commerce completa para confeitaria artesanal**
 
-Baseado nas interfaces de `backend/src/tipos/`.
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase&logoColor=white)](https://supabase.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-```mermaid
-classDiagram
-    class Usuario {
-        +string id
-        +string nome
-        +string email
-        +string telefone
-        +Role role
-        +Date criado_em
-    }
-    class Cliente {
-        +string id
-        +string nome
-        +string telefone
-        +Date criado_em
-    }
-    class Bolo {
-        +string id
-        +string nome
-        +string descricao
-        +number preco
-        +string imagem_url
-        +number estoque
-        +boolean sob_encomenda
-        +boolean ativo
-    }
-    class CarrinhoItem {
-        +string id
-        +string usuario_id
-        +string bolo_id
-        +number quantidade
-        +Date criado_em
-        +Date atualizado_em
-        +subtotal() number
-    }
-    class Pedido {
-        +string id
-        +number numero_pedido
-        +string clienteId
-        +number total
-        +PedidoStatus status
-        +Date data
-    }
-    class ItemPedido {
-        +string id
-        +string pedidoId
-        +string boloId
-        +number quantidade
-        +number precoUnitario
-    }
-    class Role {
-        <<enumeration>>
-        cliente
-        admin
-    }
-    class PedidoStatus {
-        <<enumeration>>
-        pendente
-        confirmado
-        em_preparo
-        pronto_retirada
-        saiu_entrega
-        entregue
-        cancelado
-    }
+[Funcionalidades](#-funcionalidades) · [Como rodar](#-como-rodar) · [Deploy](#-deploy) · [Documentação](#-documentação) · [Contribuir](#-contribuindo)
 
-    Usuario "1" --> "*" CarrinhoItem : possui
-    CarrinhoItem "*" --> "1" Bolo : referencia
-    Cliente "1" --> "*" Pedido : realiza
-    Pedido "1" *-- "1..*" ItemPedido : composto por
-    ItemPedido "*" --> "1" Bolo : refere-se a
-    Usuario --> Role
-    Pedido --> PedidoStatus
+</div>
+
+---
+
+## 📖 Sobre o projeto
+
+A&L Cakes é uma plataforma full-stack de e-commerce desenvolvida para confeitarias artesanais. O sistema conta com um site de vendas responsivo para o cliente final e um painel administrativo completo para gestão do negócio.
+
+> Desenvolvido como projeto prático da disciplina de Desenvolvimento Web — mas estruturado como uma aplicação real e pronta para produção.
+
+### Estrutura do repositório
+
+```
+/backend         # API REST (Node.js + TypeScript + Express)
+/frontend        # Site de vendas e painel admin (HTML + CSS + JS)
+/docs            # Documentação completa do sistema
+/scripts         # Scripts utilitários (seed de produtos, etc.)
+/tests           # Testes end-to-end e de integração
 ```
 
-> **Observação de modelagem:** `Usuario` (conta com login) e `Cliente` (identificado por telefone, criado/recuperado no momento do pedido) são entidades separadas no código atual. Essa duplicidade é registrada como limitação no documento de melhorias.
+---
 
-## 2. Diagrama de Classes (camadas da aplicação)
+## ✨ Funcionalidades
 
-```mermaid
-classDiagram
-    direction LR
-    class Rotas {
-        rotasAuth
-        rotasBolos
-        rotasPedidos
-        rotasCarrinho
-        rotasUsuarios
-        rotasWhatsApp
-    }
-    class Middlewares {
-        autenticacao()
-        autorizacao(roles)
-    }
-    class Controladores {
-        controladorAuth
-        controladorBolo
-        controladorPedido
-        controladorCarrinho
-        controladorUsuario
-        controladorWhatsApp
-    }
-    class Servicos {
-        servicoAuth
-        servicoBolo
-        servicoPedido
-        servicoCarrinho
-        servicoCliente
-        servicoUsuario
-        servicoWhatsApp
-    }
-    class Supabase {
-        <<PostgreSQL>>
-    }
-    Rotas --> Middlewares : usa
-    Rotas --> Controladores : delega
-    Controladores --> Servicos : chama
-    Servicos --> Supabase : consulta/grava
+### 🛒 Loja (cliente)
+- Landing page com produtos em destaque
+- Cardápio com grid de bolos e busca em tempo real
+- Página de detalhes do produto com controle de quantidade
+- Sistema de login e registro de conta
+- Carrinho de compras persistente
+- Criação e acompanhamento de pedidos
+- Finalização de pedido via WhatsApp
+
+### 🔧 Painel Admin
+- Dashboard com gráficos e métricas de vendas
+- CRUD completo de produtos, clientes e equipe
+- Gestão de pedidos e status
+- Configuração de templates de mensagem WhatsApp
+
+---
+
+## 🛠️ Tecnologias
+
+| Camada | Stack |
+|---|---|
+| **Backend** | Node.js 18+, TypeScript, Express |
+| **Banco de dados** | Supabase (PostgreSQL) |
+| **Autenticação** | JWT + bcrypt |
+| **Documentação API** | Swagger / OpenAPI |
+| **Frontend** | HTML5, CSS3, JavaScript ES6+ |
+| **Bibliotecas UI** | jQuery 3.7.1, SweetAlert2, Chart.js, Font Awesome |
+
+---
+
+## 🚀 Como rodar
+
+### Pré-requisitos
+
+- [Node.js 18+](https://nodejs.org)
+- Conta no [Supabase](https://supabase.com) (gratuito)
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/iDneris/al-cakes.git
+cd al-cakes
 ```
 
-## 3. Modelo Entidade-Relacionamento (banco de dados)
+### 2. Configure o backend
 
-Baseado em `backend/scripts/setup-database.js` e nas migrações em `backend/scripts/migrations/`.
-
-```mermaid
-erDiagram
-    USUARIOS ||--o{ CARRINHO_ITENS : possui
-    BOLOS ||--o{ CARRINHO_ITENS : "aparece em"
-    CLIENTES ||--o{ PEDIDOS : realiza
-    PEDIDOS ||--|{ PEDIDO_ITENS : contem
-    BOLOS ||--o{ PEDIDO_ITENS : "aparece em"
-
-    USUARIOS {
-        uuid id PK
-        text nome
-        text email UK
-        text senha_hash
-        text telefone
-        text role "cliente | admin"
-        timestamptz criado_em
-    }
-    CLIENTES {
-        uuid id PK
-        text nome
-        text telefone UK
-        timestamptz criado_em
-    }
-    BOLOS {
-        uuid id PK
-        text nome
-        text descricao
-        numeric preco
-        text imagem_url
-        int estoque
-        boolean sob_encomenda
-        boolean ativo
-        timestamptz criado_em
-    }
-    PEDIDOS {
-        uuid id PK
-        uuid cliente_id FK
-        int numero_pedido
-        numeric total
-        text status
-        timestamptz criado_em
-    }
-    PEDIDO_ITENS {
-        uuid id PK
-        uuid pedido_id FK
-        uuid bolo_id FK
-        int quantidade
-        numeric preco_unitario
-    }
-    CARRINHO_ITENS {
-        uuid id PK
-        uuid usuario_id FK
-        uuid bolo_id FK
-        int quantidade
-        timestamptz atualizado_em
-    }
+```bash
+cd backend
+npm install
+cp ../.env.example .env
 ```
 
-## 4. Casos de Uso
+Preencha o arquivo `.env` com suas credenciais (veja a seção [Variáveis de ambiente](#️-variáveis-de-ambiente)):
 
-```mermaid
-flowchart LR
-    V([Visitante])
-    C([Cliente logado])
-    A([Administrador])
-
-    subgraph Sistema AL Cakes
-        UC1(Consultar cardápio)
-        UC2(Ver detalhes do bolo)
-        UC3(Registrar conta)
-        UC4(Fazer login)
-        UC5(Gerenciar carrinho)
-        UC6(Finalizar pedido)
-        UC7(Acompanhar pedidos)
-        UC8(Enviar pedido via WhatsApp)
-        UC9(Gerenciar bolos - CRUD)
-        UC10(Atualizar status do pedido)
-        UC11(Gerenciar usuários)
-        UC12(Configurar mensagens WhatsApp)
-    end
-
-    V --> UC1 & UC2 & UC3 & UC4
-    C --> UC1 & UC2 & UC5 & UC6 & UC7 & UC8
-    A --> UC9 & UC10 & UC11 & UC12 & UC7
+```bash
+npm run setup    # Cria as tabelas e insere dados iniciais
+npm run dev      # Inicia o servidor em http://localhost:3000
 ```
 
-## 5. Diagrama de Sequência — Finalizar pedido
+### 3. Inicie o frontend
 
-Fluxo implementado em `servicoPedido.criar`.
+Abra `frontend/index.html` com a extensão **Live Server** (VS Code) ou via terminal:
 
-```mermaid
-sequenceDiagram
-    actor Cliente
-    participant API as controladorPedido
-    participant SP as servicoPedido
-    participant SC as servicoCarrinho
-    participant SCl as servicoCliente
-    participant SB as servicoBolo
-    participant DB as Supabase
-
-    Cliente->>API: POST /pedidos/criar (JWT, nome, telefone)
-    API->>SP: criar(usuarioId, dados)
-    SP->>SC: listar(usuarioId)
-    SC-->>SP: itens do carrinho
-    SP->>SCl: buscarOuCriar(nome, telefone)
-    SCl->>DB: select/insert clientes
-    loop cada item
-        SP->>SB: buscarPorId(boloId)
-        SB-->>SP: bolo (valida estoque se não for sob encomenda)
-    end
-    SP->>DB: insert pedidos (status = pendente, numero_pedido)
-    SP->>DB: insert pedido_itens
-    SP->>SB: reduzirEstoque(boloId, qtd)
-    SP->>SC: limpar(usuarioId)
-    SP-->>API: pedido criado
-    API-->>Cliente: 201 + pedido
+```bash
+npx serve frontend
+# Acesse http://localhost:8080
 ```
 
-## 6. Diagrama de Estados — Pedido
+---
 
-Estados definidos em `PedidoStatus` (`backend/src/tipos/Pedido.ts`).
+## ⚙️ Variáveis de ambiente
 
-```mermaid
-stateDiagram-v2
-    [*] --> pendente
-    pendente --> confirmado
-    confirmado --> em_preparo
-    em_preparo --> pronto_retirada
-    em_preparo --> saiu_entrega
-    saiu_entrega --> entregue
-    pronto_retirada --> entregue
-    pendente --> cancelado
-    confirmado --> cancelado
-    entregue --> [*]
-    cancelado --> [*]
+Copie `.env.example` para `.env` e preencha os valores:
+
+| Variável | Descrição |
+|---|---|
+| `PORT` | Porta do servidor (padrão: `3000`) |
+| `CORS_ORIGIN` | Origem permitida pelo CORS |
+| `NODE_ENV` | Ambiente (`development` / `production`) |
+| `SUPABASE_URL` | URL do projeto no Supabase |
+| `SUPABASE_ANON_KEY` | Chave pública (anon) do Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Chave de serviço do Supabase |
+| `SUPABASE_DB_PASSWORD` | Senha do banco de dados |
+| `JWT_SECRET` | Segredo JWT (mínimo 32 caracteres) |
+
+---
+
+## 🧪 Contas de teste
+
+Após executar `npm run setup`, as seguintes contas estarão disponíveis:
+
+| Perfil | E-mail | Senha |
+|---|---|---|
+| **Admin** | admin@loja.com | admin123 |
+| **Cliente** | dneris@email.com | cliente123 |
+
+---
+
+## 📦 Deploy
+
+### Backend — Vercel
+
+```bash
+cd backend
+npm install -g vercel
+vercel --prod
 ```
 
-> As transições acima representam o fluxo esperado do negócio. Hoje a API aceita qualquer troca de status (não há validação de transição); isso está listado como melhoria.
+### Frontend — Vercel ou GitHub Pages
 
-## 7. Arquitetura
-
-```mermaid
-flowchart TD
-    F["Frontend<br/>HTML + CSS + JS (jQuery)"] -->|HTTP / REST + JWT| B["Backend<br/>Node.js + Express + TypeScript"]
-    B -->|supabase-js| D[("Supabase<br/>PostgreSQL")]
-    B -.->|links wa.me| W[WhatsApp]
-    B --> S["Swagger UI<br/>/api-docs"]
+```bash
+cd frontend
+vercel --prod
 ```
+
+> Lembre-se de configurar as variáveis de ambiente na plataforma de deploy escolhida.
+
+---
+
+## 📚 Documentação
+
+A pasta [`/docs`](./docs) contém documentação detalhada de cada camada do sistema:
+
+| Diretório | Conteúdo |
+|---|---|
+| [`/docs/api`](./docs/api) | Referência completa dos endpoints REST |
+| [`/docs/database`](./docs/database) | Esquema e modelo do banco de dados |
+| [`/docs/arquitetura`](./docs/arquitetura) | Visão geral da arquitetura do sistema |
+| [`/docs/projeto`](./docs/projeto) | Guia de instalação e deploy |
+| [`/docs/frontend`](./docs/frontend) | Documentação do frontend |
+
+A documentação interativa da API (Swagger) fica disponível em `http://localhost:3000/api-docs` com o servidor rodando.
+
+---
+
+## 🤝 Contribuindo
+
+### Fluxo de branches
+
+Este projeto usa um fluxo Git simplificado com três branches principais:
+
+| Branch | Propósito | Quando usar |
+|---|---|---|
+| **main** | Produção | Código estável e testado |
+| **homolog** | Homologação | Pré-produção, testes finais |
+| **develop** | Desenvolvimento | Branch principal de trabalho |
+
+### Como contribuir
+
+1. Faça um **fork** do projeto
+2. Crie uma branch a partir de `develop`:
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/minha-feature
+   ```
+3. Commit suas alterações (`git commit -m 'feat: adiciona minha feature'`)
+4. Push para a branch (`git push origin feature/minha-feature`)
+5. Abra um **Pull Request** para `develop`
+
+> Use o padrão [Conventional Commits](https://www.conventionalcommits.org/pt-br/) nas mensagens de commit, **em português**.
+>
+> Exemplos:
+> - `feat: adiciona carrinho de compras`
+> - `fix: corrige erro de login`
+> - `docs: atualiza README com novo fluxo`
+
+---
+
+## 📄 Licença
+
+Distribuído sob a licença MIT. Veja [`LICENSE`](./LICENSE) para mais informações.
+
+---
+
+<div align="center">
+
+Feito com 🎂 por **[Dneris](https://github.com/iDneris)**
+
+</div>
